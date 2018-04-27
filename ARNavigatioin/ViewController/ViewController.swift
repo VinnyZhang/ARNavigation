@@ -10,29 +10,36 @@ import UIKit
 import SceneKit
 import ARKit
 
-class ViewController: UIViewController ,ARSCNViewDelegate{
+class ViewController: UIViewController {
     
     var sceneView: ARSCNView! //场景
     var planes = [UUID:Plane]() //字典，存储场景中当前渲染的所有平面
     var sessionConfig: ARConfiguration!//会话配置
     var tipLabel = UILabel() //提示标签
     var vetecorLabel = UILabel() //位置信息
-    var countSession: Int = 0
-    
-    //    MARK: - viewcontroller的生命周期
+    var hasShowAlert = false//是否已经展示过扫码后的提示信息
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setupScene()
-        
         setupMySubView()
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setupSession()
+        if !hasShowAlert {
+            hasShowAlert = true
+            let alertView = UIAlertController(title: "提示", message: "请站在原地对准地面，我们将为您加载导航", preferredStyle: .alert)
+            let cancelAction = UIAlertAction(title: "取消", style: .cancel) { (cancelAction) in
+                
+            }
+            alertView.addAction(cancelAction)
+            //        alertView.show(self, sender: nil)
+            self.present(alertView, animated: true) {
+                
+            }
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -45,103 +52,11 @@ class ViewController: UIViewController ,ARSCNViewDelegate{
         // Dispose of any resources that can be recreated.
     }
     
-    //    MARK: - ARSCNViewDelegate
-    //    MARK:请求代理 新建一个ScenKit节点，与 anchor相对应
-//    func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
-//
-//    }
-    //    MARK: 通知代理。一个与新的anchor相对应的scnnode节点已经添加到当前场景中
-    func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
-        guard let anchor = anchor as? ARPlaneAnchor else {
-            return
-        }
-
-        // 检测到新平面时创建 SceneKit 平面以实现 3D 视觉化
-//        let plane = Plane(withAnchor: anchor)
-//        planes[anchor.identifier] = plane
-//        node.addChildNode(plane)
-
-    }
-    
-    //    MARK: 通知代理 SceneKit中的scnnode将被更新，以匹配相对应的anchor当前的状态
-    func renderer(_ renderer: SCNSceneRenderer, willUpdate node: SCNNode, for anchor: ARAnchor) {
-        
-        
-    }
-    //    MARK: 通知代理 ScenKit中的SCNNode已被更新，以匹配相对应的anchor当前状态
-    func renderer(_ renderer: SCNSceneRenderer, didUpdate node: SCNNode, for anchor: ARAnchor) {
-//        // 查看此平面当前是否正在渲染
-//        guard let plane = planes[anchor.identifier] else {
-//            return
-//        }
-//
-//        // anchor 更新后也需要更新 3D 几何体。例如平面检测的高度和宽度可能会改变，所以需要更新 SceneKit 几何体以匹配
-//        plane.update(anchor: anchor as! ARPlaneAnchor)
-    }
-    
-    /// 通知代理 已经将一个与被删除的anchor相对应的scnnode节点从场景中删除
-    ///
-    /// - Parameters:
-    ///   - renderer: f
-    ///   - node: f
-    ///   - anchor: f
-    func renderer(_ renderer: SCNSceneRenderer, didRemove node: SCNNode, for anchor: ARAnchor) {
-//        planes.removeValue(forKey: anchor.identifier)
-    }
-    
-    
-    
-    //    MARK: 相机状态变化
-    func session(_ session: ARSession, cameraDidChangeTrackingState camera: ARCamera) {
-        
-        countSession += 1
-        //判断状态
-        switch camera.trackingState{
-        case .notAvailable:
-            tipLabel.text = "跟踪不可用 \(countSession)"
-        case .limited(ARCamera.TrackingState.Reason.initializing):
-            let title = "有限的跟踪 \(countSession) ，原因是："
-            let desc = "正在初始化，请稍后"
-            tipLabel.text = title + desc
-        case .limited(ARCamera.TrackingState.Reason.relocalizing):
-            tipLabel.text = "有限的跟踪，原因是：重新初始化 \(countSession)"
-        case .limited(ARCamera.TrackingState.Reason.excessiveMotion):
-            tipLabel.text = "有限的跟踪，原因是：设备移动过快请注意 \(countSession)"
-        case .limited(ARCamera.TrackingState.Reason.insufficientFeatures):
-            tipLabel.text = "有限的跟踪，原因是：提取不到足够的特征点，请移动设备 \(countSession)"
-        case .normal:
-            tipLabel.text = "跟踪正常 \(countSession)"
-        }
-        
-        
-        
-    }
-    //    MARK: 会话被中断
-    func sessionWasInterrupted(_ session: ARSession) {
-        tipLabel.text = "会话中断"
-    }
-    
-    //    MARK: 会话中断结束
-    func sessionInterruptionEnded(_ session: ARSession) {
-        tipLabel.text = "会话中断结束，已重置会话"
-        sceneView.session.run(self.sessionConfig, options: .resetTracking)
-    }
-    
-    //    MARK: 会话失败
-    func session(_ session: ARSession, didFailWithError error: Error) {
-        tipLabel.text = error.localizedDescription
-    }
-    
-    
-    //    MARK: - 触控
-    
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         sessionCurrentFrame()
     }
     
-    
-    //    MARK: - private
-    
+    /// 初始化子视图
     private func setupMySubView() {
         self.view.addSubview(tipLabel)
         tipLabel.frame = CGRect(x: 0, y: 20, width: self.view.frame.size.width, height: 30)
@@ -151,22 +66,20 @@ class ViewController: UIViewController ,ARSCNViewDelegate{
         vetecorLabel.frame = CGRect(x: 0, y: tipLabel.frame.origin.y + tipLabel.frame.size.height + 5, width: self.view.frame.size.width, height: 300)
         vetecorLabel.numberOfLines = 0
         vetecorLabel.textColor = UIColor.blue
-        
-        
-        
     }
     
-    //MARK: 初始化场景
+    //初始化场景
     private func setupScene() {
         sceneView = ARSCNView()
         sceneView.frame = self.view.frame
         self.view.addSubview(sceneView)
         sceneView.delegate = self
-        sceneView.showsStatistics = false
+        sceneView.session.delegate = self
         sceneView.autoenablesDefaultLighting = true
         sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints]
     }
-    //    MARK: 配置会话
+    
+    // 配置会话
     private func setupSession() {
         if ARWorldTrackingConfiguration.isSupported {//判断是否支持6个自由度
             let worldTracking = ARWorldTrackingConfiguration()
@@ -180,7 +93,8 @@ class ViewController: UIViewController ,ARSCNViewDelegate{
         }
         sceneView.session.run(sessionConfig)
     }
-    //    MARK: 手机的方位
+    
+    //手机的位姿
     private func sessionCurrentFrame() {
         if let currentFrame = sceneView.session.currentFrame {
             
@@ -204,8 +118,7 @@ class ViewController: UIViewController ,ARSCNViewDelegate{
                 }
             }
             
-//            matrixChange(transform: transform,originVector: vector_float4(x: 0, y: 0, z: 0, w: 1))
-//            addARNavigation(transform: transform)
+            addARNavigation(transform: transform)
             var eulerAngles = currentFrame.camera.eulerAngles
             infoStr.append("相机的方向定义为欧拉角: \n")
             infoStr.append("\(eulerAngles.x) , \(eulerAngles.y) ,\(eulerAngles.z) \n")
@@ -215,29 +128,27 @@ class ViewController: UIViewController ,ARSCNViewDelegate{
         }
     }
     
-    private func matrixChange(transform: matrix_float4x4 ,originVector: vector_float4) -> (SCNVector3){
-        let mx = transform.columns.0.x * originVector.x - transform.columns.1.y * originVector.y + transform.columns.3.x * originVector.w
-        let my = transform.columns.0.y * originVector.x - transform.columns.1.y * originVector.y + transform.columns.3.y * originVector.w
-        let mz = originVector.z + transform.columns.3.z * originVector.w
-        let mw = originVector.w
+    
+    /// 手机到墙壁的距离
+    private func phoneToWallDistance() -> CGFloat {
+        var distance: CGFloat
+        distance = 0.0
+        let centerPoint = CGPoint(x: 0.5, y: 0.5)
+        self.sceneView.session.currentFrame?.camera.viewMatrix(for: .portraitUpsideDown)
         
+        if let result = self.sceneView.session.currentFrame?.hitTest(centerPoint, types: .featurePoint).first {
+             distance = result.distance
+        }
         
-        
-        print("mx= \(mx) my= \(my) mz= \(mz) mw=\(mw)")
-        
-        return SCNVector3Make(mx, my, mz)
+//        if let result = self.sceneView.hitTest(centerPoint, types: .featurePoint).first {
+//             distance = result.distance
+//        }
+        return distance
     }
     
-    
-    private func planeAnchor()
-    {
-        
-    }
     
     /// MARK: 添加导航节点
     private func addARNavigation(transform: matrix_float4x4) {
-        
-        
         
 //        向右走
         let navigationRightGeometry = SCNBox(width: 4.0, height: 0.01, length: 0.1, chamferRadius: 0.0)
@@ -250,10 +161,8 @@ class ViewController: UIViewController ,ARSCNViewDelegate{
         
         let navigationRightNode = SCNNode(geometry: navigationRightGeometry)
         
-        let vectionR:SCNVector3 = matrixChange(transform:transform , originVector: vector_float4(x: 2.0, y: -1.3, z: 1, w: 1))
+        navigationRightNode.position = SCNVector3Make(2.0, -1.3, 1)
         
-//        navigationRightNode.position = SCNVector3Make(2.0, -1.3, 1)
-        navigationRightNode.position = vectionR
         
         sceneView.scene.rootNode.addChildNode(navigationRightNode)
         
@@ -267,10 +176,7 @@ class ViewController: UIViewController ,ARSCNViewDelegate{
         
         let navigationUpNode = SCNNode(geometry: navigationUpGeometry)
         
-        let vectionUp:SCNVector3 = matrixChange(transform:transform , originVector: vector_float4(x: 4.0, y: -1.3, z: -1.5, w: 1))
-        
-//        navigationUpNode.position = SCNVector3Make(4.0, -1.3, -1.5)
-        navigationUpNode.position = vectionUp
+        navigationUpNode.position = SCNVector3Make(4.0, -1.3, -1.5)
         
         sceneView.scene.rootNode.addChildNode(navigationUpNode)
         
@@ -284,10 +190,8 @@ class ViewController: UIViewController ,ARSCNViewDelegate{
         
         let navigationLeftNode = SCNNode(geometry: navigationLeftGeometry)
         
-        let vectionL:SCNVector3 = matrixChange(transform:transform , originVector: vector_float4(x: 3.0, y: -1.3, z: -4.0, w: 1))
+        navigationLeftNode.position = SCNVector3Make(3.0, -1.3, -4.0)
         
-//        navigationLeftNode.position = SCNVector3Make(3.0, -1.3, -4.0)
-        navigationLeftNode.position = vectionL
         
         sceneView.scene.rootNode.addChildNode(navigationLeftNode)
         
@@ -295,6 +199,135 @@ class ViewController: UIViewController ,ARSCNViewDelegate{
         
     }
 
+    
+    
 
+}
+
+// MARK: - ARSCNViewDelegate
+
+extension ViewController: ARSCNViewDelegate {
+    
+    func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
+        
+    }
+    
+    //    MARK:请求代理 新建一个ScenKit节点，与 anchor相对应
+    func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
+        print("renderer-nodeFor")
+        return nil
+    }
+    //    MARK: 通知代理。一个与新的anchor相对应的scnnode节点已经添加到当前场景中
+    func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
+        print("renderer-didAdd")
+        //        guard let anchor = anchor as? ARPlaneAnchor else {
+        //            return
+        //        }
+        
+        // 检测到新平面时创建 SceneKit 平面以实现 3D 视觉化
+        //        let plane = Plane(withAnchor: anchor)
+        //        planes[anchor.identifier] = plane
+        //        node.addChildNode(plane)
+        
+        
+        
+    }
+    
+    //    MARK: 通知代理 SceneKit中的scnnode将被更新，以匹配相对应的anchor当前的状态
+    func renderer(_ renderer: SCNSceneRenderer, willUpdate node: SCNNode, for anchor: ARAnchor) {
+        print("renderer-willUpdate")
+        
+    }
+    //    MARK: 通知代理 ScenKit中的SCNNode已被更新，以匹配相对应的anchor当前状态
+    func renderer(_ renderer: SCNSceneRenderer, didUpdate node: SCNNode, for anchor: ARAnchor) {
+        
+        print("renderer-didUpdate")
+        //        // 查看此平面当前是否正在渲染
+        //        guard let plane = planes[anchor.identifier] else {
+        //            return
+        //        }
+        //
+        //        // anchor 更新后也需要更新 3D 几何体。例如平面检测的高度和宽度可能会改变，所以需要更新 SceneKit 几何体以匹配
+        //        plane.update(anchor: anchor as! ARPlaneAnchor)
+    }
+    
+    /// 通知代理 已经将一个与被删除的anchor相对应的scnnode节点从场景中删除
+    ///
+    /// - Parameters:
+    ///   - renderer: f
+    ///   - node: f
+    ///   - anchor: f
+    func renderer(_ renderer: SCNSceneRenderer, didRemove node: SCNNode, for anchor: ARAnchor) {
+        //        planes.removeValue(forKey: anchor.identifier)
+    }
+    
+    
+    
+    //    MARK: 相机状态变化
+    func session(_ session: ARSession, cameraDidChangeTrackingState camera: ARCamera) {
+        
+        //判断状态
+        switch camera.trackingState{
+        case .notAvailable:
+            tipLabel.text = "跟踪不可用 "
+        case .limited(ARCamera.TrackingState.Reason.initializing):
+            let title = "有限的跟踪 ，原因是："
+            let desc = "正在初始化，请稍后"
+            tipLabel.text = title + desc
+        case .limited(ARCamera.TrackingState.Reason.relocalizing):
+            tipLabel.text = "有限的跟踪，原因是：重新初始化"
+        case .limited(ARCamera.TrackingState.Reason.excessiveMotion):
+            tipLabel.text = "有限的跟踪，原因是：设备移动过快请注意"
+        case .limited(ARCamera.TrackingState.Reason.insufficientFeatures):
+            tipLabel.text = "有限的跟踪，原因是：提取不到足够的特征点，请移动设备"
+        case .normal:
+            tipLabel.text = "跟踪正常"
+            
+        }
+        
+        
+        
+    }
+    
+    
+    //    MARK: 会话被中断
+    func sessionWasInterrupted(_ session: ARSession) {
+        tipLabel.text = "会话中断"
+    }
+    
+    
+    //    MARK: 会话中断结束
+    func sessionInterruptionEnded(_ session: ARSession) {
+        tipLabel.text = "会话中断结束，已重置会话"
+        sceneView.session.run(self.sessionConfig, options: .resetTracking)
+    }
+    
+    //    MARK: 会话失败
+    func session(_ session: ARSession, didFailWithError error: Error) {
+        tipLabel.text = error.localizedDescription
+    }
+}
+
+
+// MARK: - ARSessionDelegate
+
+extension ViewController: ARSessionDelegate {
+    
+    func session(_ session: ARSession, didUpdate frame: ARFrame) {
+//        print("session-didUpdate")
+    }
+    
+    func session(_ session: ARSession, didAdd anchors: [ARAnchor]) {
+        print("session-didAdd")
+    }
+    
+    func session(_ session: ARSession, didUpdate anchors: [ARAnchor]) {
+        print("session-didUpdate")
+    }
+    
+    func session(_ session: ARSession, didRemove anchors: [ARAnchor]) {
+        print("session-didRemove")
+    }
+    
 }
 
