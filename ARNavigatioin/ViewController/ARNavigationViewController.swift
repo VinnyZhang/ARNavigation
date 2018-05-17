@@ -13,9 +13,9 @@ import ARKit
 import SceneKit
 
 /// 导航主视图
+//识别图像之后，，重新开启ARScence并，设置世界原点
 class ARNavigationViewController: ARSCNBaseViewController {
 
-    
     /// 定位管理器，用于获取真实世界的方向
     var CLManager = CLLocationManager()
     
@@ -31,7 +31,10 @@ class ARNavigationViewController: ARSCNBaseViewController {
     /// 设备传感管理器
     var deviceMotionManager: CMMotionManager!
     
-    var navControl: DrawNavigation!
+    var navControl: DrawNavigation!//导航绘制类
+    
+    var needResetOrignalWorld = false //是否需要重新设置世界原点
+    
     
     /// MARK: - life cycle
     
@@ -39,11 +42,11 @@ class ARNavigationViewController: ARSCNBaseViewController {
         super.viewDidLoad()
         self.title = "AR导航"
         setupMyView()
+        
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        
     }
     
     
@@ -78,10 +81,25 @@ class ARNavigationViewController: ARSCNBaseViewController {
             sessionConfiguration = orientationTracking
         }
         
-        
-        
         gameView.session.run(sessionConfiguration)
-        CLManager.startUpdatingHeading()
+        
+    }
+    
+    /// 重置世界原点
+    override func resetOrignalWorld() {
+        if needResetOrignalWorld {
+            let matrix4_X = SCNMatrix4MakeRotation(0.0, 1.0, 0.0, 0.0)
+            let r_matrix4_Y = SCNMatrix4MakeRotation(Float(directioinAngle), 0.0, 1.0, 0.0)//设置绕Y轴旋转
+            let matrix4_Z = SCNMatrix4MakeRotation(0.0, 0.0, 0.0, 1.0)
+            
+            let t1_matrix4_T = SCNMatrix4MakeTranslation(0.0, -1.5, 1.0)//重新设置中心点的位置 向下 1.5m 向后 1.0m
+            
+            let mXY = SCNMatrix4Mult(matrix4_X, r_matrix4_Y)
+            let mXYZ = SCNMatrix4Mult(mXY, matrix4_Z)
+            let mT = SCNMatrix4Mult(mXYZ, t1_matrix4_T)
+            
+            gameView.session.setWorldOrigin(relativeTransform: simd_float4x4(mT))
+        }
     }
     
     
@@ -90,6 +108,7 @@ class ARNavigationViewController: ARSCNBaseViewController {
     /// 初始化视图
     private func setupMyView() {
         CLManager.delegate = self
+        CLManager.startUpdatingHeading()
     }
     
     /// 开启设备位姿检测
@@ -106,71 +125,57 @@ class ARNavigationViewController: ARSCNBaseViewController {
                 self.deviceMotionSuccess = true
                 
                 self.deviceMotionManager.stopDeviceMotionUpdates()
-                let pitch = (motion?.attitude.pitch)! //x
-                let roll = (motion?.attitude.roll)!  //z
-                
-                let absPitch = abs(pitch)
-                let absRoll = abs(roll)
-                
-                //第一象限   pitch x = Optional(0.29111783950973613)  yaw y = Optional(0.099599084804281382)  roll z = Optional(-0.33503381207303545)
-                if pitch >= 0.0 && roll <= 0.0 {
-                    if absPitch < absRoll  {//x轴旋转的角度 小于 z轴旋转的角度 以X轴正方向为初始值
-                        self.directioinAngle = self.directioinAngle + 90 / 180 * .pi
-                        self.directioinAngle = self.directioinAngle - absPitch
-                    }
-                    else if absPitch > absRoll {
-                        //                        self.angle = 0
-                        self.directioinAngle = self.directioinAngle + absRoll
-                    }
-                    else {
-                        self.directioinAngle = self.directioinAngle - (45 / 180 * .pi)
-                    }
-                    self.changeWorldOrigin()
-                }
-                else if pitch >= 0.0 && roll >= 0.0 {// 第四象限
-                    if absPitch < absRoll {//x<z
-                        self.directioinAngle = self.directioinAngle - ((90 / 180 * .pi) - absPitch)
-                    }
-                    else if absPitch > absRoll {// x> z
-                        self.directioinAngle = self.directioinAngle - absRoll
-                    }
-                    else {
-                        self.directioinAngle = self.directioinAngle + (45 / 180 * .pi)
-                    }
-                    self.changeWorldOrigin()
-                }
-                else {
-                    
-                }
-                
-                self.goDrawNavigation()
-                
-                
+                let pitch = (motion?.attitude.pitch)! //绕x轴旋转的弧度
+                let roll = (motion?.attitude.roll)!  //绕z轴旋转的弧度
+                self.calculateDirection(pitch: pitch, roll: roll)
             }
-            
         }
+    }
+    
+    //计算绕Y轴需要选择的角度
+    private func calculateDirection(pitch :Double , roll :Double) {
+        
+        let absPitch = abs(pitch)
+        let absRoll = abs(roll)
+        
+        //第一象限   pitch x = Optional(0.29111783950973613)  yaw y = Optional(0.099599084804281382)  roll z = Optional(-0.33503381207303545)
+        if pitch >= 0.0 && roll <= 0.0 {
+            if absPitch < absRoll  {//x轴旋转的角度 小于 z轴旋转的角度 以X轴正方向为初始值
+                self.directioinAngle = self.directioinAngle + 90 / 180 * .pi
+                self.directioinAngle = self.directioinAngle - absPitch
+            }
+            else if absPitch > absRoll {
+                //                        self.angle = 0
+                self.directioinAngle = self.directioinAngle + absRoll
+            }
+            else {
+                self.directioinAngle = self.directioinAngle - (45 / 180 * .pi)
+            }
+            self.changeWorldOrigin()
+        }
+        else if pitch >= 0.0 && roll >= 0.0 {// 第四象限
+            if absPitch < absRoll {//x<z
+                self.directioinAngle = self.directioinAngle - ((90 / 180 * .pi) - absPitch)
+            }
+            else if absPitch > absRoll {// x> z
+                self.directioinAngle = self.directioinAngle - absRoll
+            }
+            else {
+                self.directioinAngle = self.directioinAngle + (45 / 180 * .pi)
+            }
+            self.changeWorldOrigin()
+        }
+        
+        self.goDrawNavigation()
+        
     }
     
     /// 改变AR中世界坐标系的原点坐标轴方向
     private func changeWorldOrigin() {
-        //        Y轴作为重力方向，只需绕着Y轴旋转世界原点坐标的方向，来匹配 东南西北。匹配后 Z轴负方向指向南方
         
-        let matrix4_X = SCNMatrix4MakeRotation(0.0, 1.0, 0.0, 0.0)
-        let matrix4_Y = SCNMatrix4MakeRotation(Float(directioinAngle), 0.0, 1.0, 0.0)//设置绕Y轴旋转
-        let matrix4_Z = SCNMatrix4MakeRotation(0.0, 0.0, 0.0, 1.0)
-        
-//        self.gameView.session.currentFrame?.camera.transform.columns.3.x
-//        self.gameView.session.currentFrame?.camera.transform.columns.3.y -
-//        self.gameView.session.currentFrame?.camera.transform.columns.3.z
-        
-        let matrix4_T = SCNMatrix4MakeTranslation(0.0, -1.5, 1.0)//重新设置中心点的位置
-        
-        let mXY = SCNMatrix4Mult(matrix4_X, matrix4_Y)
-        let mXYZ = SCNMatrix4Mult(mXY, matrix4_Z)
-        let mT = SCNMatrix4Mult(mXYZ, matrix4_T)
-        
-        gameView.session.setWorldOrigin(relativeTransform: simd_float4x4(mT))
-        
+        self.gameView.session.pause()
+        self.gameView.session.run(sessionConfiguration, options: .resetTracking)
+    
     }
     
     
@@ -189,6 +194,12 @@ class ARNavigationViewController: ARSCNBaseViewController {
         
         self.navControl.showNavigation(navArray: navArray, downRice: 1.5, backRice: 0.0)
         
+    }
+    
+    /// 识别图片成功
+    private func distinguishSuccess() {
+        needResetOrignalWorld = true
+        deviceMotionPush()
     }
     
     /// 设置导航
@@ -261,8 +272,8 @@ class ARNavigationViewController: ARSCNBaseViewController {
             print("girl_1")
         }
         else if refrenceImage.name == "girl_2" {
-//            print("girl_2")
-//            setupNavigation()
+            print("girl_2")
+            distinguishSuccess()
         }
         else if refrenceImage.name == "girl_3" {
             print("girl_3")
@@ -272,7 +283,6 @@ class ARNavigationViewController: ARSCNBaseViewController {
     
 
 }
-
 
 
 
@@ -286,15 +296,7 @@ extension ARNavigationViewController: CLLocationManagerDelegate {
             return
         }
         
-        if !directionSuccess {
-            directionSuccess = true
-            
-            CLManager.stopUpdatingHeading()
-            
-            directioinAngle = -((180 - newHeading.magneticHeading)/180 * .pi)
-            
-            deviceMotionPush()
-        }
+        directioinAngle = -((180 - newHeading.magneticHeading)/180 * .pi)
         
     }
     

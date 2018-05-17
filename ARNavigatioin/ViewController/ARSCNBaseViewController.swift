@@ -82,6 +82,12 @@ class ARSCNBaseViewController: UIViewController {
         }
         gameView.session.run(sessionConfiguration)
     }
+    
+    
+    /// 重新设置世界原点位置
+    func resetOrignalWorld() {
+        
+    }
 
     
 
@@ -131,6 +137,7 @@ extension ARSCNBaseViewController: ARSCNViewDelegate {
         case .normal:
             alertLabel.text = "跟踪正常"
 //            print("limited = \(String(describing: gameView.session.currentFrame?.camera.eulerAngles))")
+            resetOrignalWorld()
             UIView.animate(withDuration: 0.5) {
                 self.maskView.alpha = 0.0
             }
