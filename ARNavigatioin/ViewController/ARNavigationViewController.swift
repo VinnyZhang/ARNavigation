@@ -12,6 +12,12 @@ import CoreMotion
 import ARKit
 import SceneKit
 
+enum DistinationType {
+    case Car_1
+    case Car_2
+    case Car_3
+}
+
 /// 导航主视图
 //识别图像之后，，重新开启ARScence并，设置世界原点
 class ARNavigationViewController: ARSCNBaseViewController {
@@ -28,12 +34,17 @@ class ARNavigationViewController: ARSCNBaseViewController {
     /// 真实世界中正南方向偏移的弧度
     var directioinAngle: Double!
     
+    /// 世界坐标系旋转到正方位的角度（决定于设备的位姿）
+    var deviceAngle: Double = 0.0
+    
     /// 设备传感管理器
     var deviceMotionManager: CMMotionManager!
     
     var navControl: DrawNavigation!//导航绘制类
     
     var needResetOrignalWorld = false //是否需要重新设置世界原点
+    
+    var distinationType: DistinationType!
     
     
     /// MARK: - life cycle
@@ -60,17 +71,17 @@ class ARNavigationViewController: ARSCNBaseViewController {
             let refrenceImage_1 = ARReferenceImage.init((image_1?.cgImage)!, orientation: .up, physicalWidth: 0.3)
             refrenceImage_1.name = "golden_century_1"
             
-            let image_2 = UIImage(named: "girl_1.jpeg")
+            let image_2 = UIImage(named: "car_1.jpg")
             let refrenceImage_2 = ARReferenceImage.init((image_2?.cgImage)!, orientation: .up, physicalWidth: 0.3)
-            refrenceImage_2.name = "girl_1"
+            refrenceImage_2.name = "car_1"
             
-            let image_3 = UIImage(named: "girl_2.jpg")
+            let image_3 = UIImage(named: "car_2.jpg")
             let refrenceImage_3 = ARReferenceImage.init((image_3?.cgImage)!, orientation: .up, physicalWidth: 0.3)
-            refrenceImage_3.name = "girl_2"
+            refrenceImage_3.name = "car_2"
 
-            let image_4 = UIImage(named: "girl_3.jpeg")
+            let image_4 = UIImage(named: "car_3.jpg")
             let refrenceImage_4 = ARReferenceImage.init((image_4?.cgImage)!, orientation: .up, physicalWidth: 0.3)
-            refrenceImage_4.name = "girl_3"
+            refrenceImage_4.name = "car_3"
             
             worldTracking.detectionImages = [refrenceImage_1,refrenceImage_2,refrenceImage_3,refrenceImage_4]
             
@@ -88,17 +99,22 @@ class ARNavigationViewController: ARSCNBaseViewController {
     /// 重置世界原点
     override func resetOrignalWorld() {
         if needResetOrignalWorld {
+            needResetOrignalWorld = false
+            
             let matrix4_X = SCNMatrix4MakeRotation(0.0, 1.0, 0.0, 0.0)
-            let r_matrix4_Y = SCNMatrix4MakeRotation(Float(directioinAngle), 0.0, 1.0, 0.0)//设置绕Y轴旋转
+            let r_matrix4_Y = SCNMatrix4MakeRotation(Float(deviceAngle + directioinAngle), 0.0, 1.0, 0.0)//设置世界坐标的正方向
             let matrix4_Z = SCNMatrix4MakeRotation(0.0, 0.0, 0.0, 1.0)
             
-            let t1_matrix4_T = SCNMatrix4MakeTranslation(0.0, -1.5, 1.0)//重新设置中心点的位置 向下 1.5m 向后 1.0m
+            let t1_matrix4_T = SCNMatrix4MakeTranslation(0.0, -1.0, 1.0)//重新设置中心点的位置 向下 1.5m 向后 1.0m
             
             let mXY = SCNMatrix4Mult(matrix4_X, r_matrix4_Y)
             let mXYZ = SCNMatrix4Mult(mXY, matrix4_Z)
             let mT = SCNMatrix4Mult(mXYZ, t1_matrix4_T)
             
             gameView.session.setWorldOrigin(relativeTransform: simd_float4x4(mT))
+            
+            self.goDrawNavigation()
+            
         }
     }
     
@@ -113,9 +129,12 @@ class ARNavigationViewController: ARSCNBaseViewController {
     
     /// 开启设备位姿检测
     private func deviceMotionPush() {
-        deviceMotionManager = CMMotionManager()
+        if deviceMotionManager == nil {
+            deviceMotionManager = CMMotionManager()
+            
+            deviceMotionManager.deviceMotionUpdateInterval = 0.5
+        }
         let queue = OperationQueue()
-        deviceMotionManager.deviceMotionUpdateInterval = 0.5
         deviceMotionManager.startDeviceMotionUpdates(to: queue) { (motion, error) in
             
             //手机位姿
@@ -141,32 +160,29 @@ class ARNavigationViewController: ARSCNBaseViewController {
         //第一象限   pitch x = Optional(0.29111783950973613)  yaw y = Optional(0.099599084804281382)  roll z = Optional(-0.33503381207303545)
         if pitch >= 0.0 && roll <= 0.0 {
             if absPitch < absRoll  {//x轴旋转的角度 小于 z轴旋转的角度 以X轴正方向为初始值
-                self.directioinAngle = self.directioinAngle + 90 / 180 * .pi
-                self.directioinAngle = self.directioinAngle - absPitch
+                self.deviceAngle = 90 / 180 * .pi - absPitch
             }
             else if absPitch > absRoll {
                 //                        self.angle = 0
-                self.directioinAngle = self.directioinAngle + absRoll
+                self.deviceAngle = absRoll
             }
             else {
-                self.directioinAngle = self.directioinAngle - (45 / 180 * .pi)
+                self.deviceAngle = -(45 / 180 * .pi)
             }
             self.changeWorldOrigin()
         }
         else if pitch >= 0.0 && roll >= 0.0 {// 第四象限
             if absPitch < absRoll {//x<z
-                self.directioinAngle = self.directioinAngle - ((90 / 180 * .pi) - absPitch)
+                self.deviceAngle = -((90 / 180 * .pi) - absPitch)
             }
             else if absPitch > absRoll {// x> z
-                self.directioinAngle = self.directioinAngle - absRoll
+                self.deviceAngle = -absRoll
             }
             else {
-                self.directioinAngle = self.directioinAngle + (45 / 180 * .pi)
+                self.deviceAngle = (45 / 180 * .pi)
             }
             self.changeWorldOrigin()
         }
-        
-        self.goDrawNavigation()
         
     }
     
@@ -182,23 +198,43 @@ class ARNavigationViewController: ARSCNBaseViewController {
     /// 绘制导航
     private func goDrawNavigation() {
         
-        var navArray = Array<NavigationModel>()
-        let n1 = NavigationModel(directionToHead: .east, westDD: 18.0, wRice: 3.0)
-        let n2 = NavigationModel(directionToHead: .east, westDD: 110.0, wRice: 4.0)
-        let n3 = NavigationModel(directionToHead: .east, westDD: 190.0, wRice: 4.0)
-        navArray.append(n1)
-        navArray.append(n2)
-        navArray.append(n3)
+        if distinationType == DistinationType.Car_1 {
+            var navArray = Array<NavigationModel>()
+            
+            let n1 = NavigationModel(directionToHead: .east, westDD: 18.0, wRice: 3.6)
+            let n2 = NavigationModel(directionToHead: .east, westDD: 292.0, wRice: 1.6)
+            let n3 = NavigationModel(directionToHead: .east, westDD: 18.0, wRice: 20.0)
+            let n4 = NavigationModel(directionToHead: .east, westDD: 292.0, wRice: 20.0)
+            navArray.append(n1)
+            navArray.append(n2)
+            navArray.append(n3)
+            navArray.append(n4)
+            
+            self.navControl = DrawNavigation(self.gameView)
+            
+            self.navControl.showNavigation(navArray: navArray, downRice: 1.5, backRice: 0.0)
+        }
+        else if distinationType == DistinationType.Car_2 {
+            var navArray = Array<NavigationModel>()
+            let n1 = NavigationModel(directionToHead: .east, westDD: 18.0, wRice: 3.4)
+            let n2 = NavigationModel(directionToHead: .east, westDD: 110.0, wRice: 4.0)
+            let n3 = NavigationModel(directionToHead: .east, westDD: 190.0, wRice: 4.0)
+            navArray.append(n1)
+            navArray.append(n2)
+            navArray.append(n3)
+            
+            self.navControl = DrawNavigation(self.gameView)
+            
+            self.navControl.showNavigation(navArray: navArray, downRice: 1.5, backRice: 0.0)
+        }
         
-        self.navControl = DrawNavigation(self.gameView)
-        
-        self.navControl.showNavigation(navArray: navArray, downRice: 1.5, backRice: 0.0)
         
     }
     
     /// 识别图片成功
     private func distinguishSuccess() {
         needResetOrignalWorld = true
+        deviceMotionSuccess = false
         deviceMotionPush()
     }
     
@@ -266,16 +302,21 @@ class ARNavigationViewController: ARSCNBaseViewController {
         let refrenceImage = imageAnchor.referenceImage
         
         if refrenceImage.name == "golden_century_1" {
+            
             print("golden_century_1")
         }
-        else if refrenceImage.name == "girl_1" {
+        else if refrenceImage.name == "car_1" {
+            self.distinationType = .Car_1
             print("girl_1")
+            distinguishSuccess()
         }
-        else if refrenceImage.name == "girl_2" {
+        else if refrenceImage.name == "car_2" {
+            self.distinationType = .Car_2
             print("girl_2")
             distinguishSuccess()
         }
-        else if refrenceImage.name == "girl_3" {
+        else if refrenceImage.name == "car_3" {
+            self.distinationType = .Car_3
             print("girl_3")
         }
         

@@ -34,6 +34,10 @@ class DrawNavigation: NSObject {
     ///   - backRice: 从扫描点向后移动的距离
     func showNavigation(navArray: Array<NavigationModel> ,downRice: Float ,backRice: Float) {
         
+//        for node in self.scenView.scene.rootNode.childNodes {
+//            node.removeFromParentNode()
+//        }
+        
         for model in navArray {
             self.navArray.append(model)
         }
@@ -60,7 +64,18 @@ class DrawNavigation: NSObject {
         
         for navModel in self.navArray {//循环取出方向导航数据，来加载世界导航节点
             
-            totalAngle = navModel.westDD - totalAngle
+            var moveAngle: Float = 0.0
+            
+            if abs(totalAngle) > navModel.westDD {
+                let tempT = abs(totalAngle) - navModel.westDD
+                moveAngle = -tempT
+                totalAngle = navModel.westDD
+            }
+            else {
+                let tempT = navModel.westDD - abs(totalAngle)
+                moveAngle = tempT
+                totalAngle = navModel.westDD
+            }
             
             let rotateNode = SCNNode(geometry: rotateGeometry)
             
@@ -84,7 +99,7 @@ class DrawNavigation: NSObject {
             let navigationNode = SCNNode(geometry: navigationGeometry)
             navigationNode.position = SCNVector3Make(navModel.wRice/2, 0.0, 0.0)
             rotateNode.addChildNode(navigationNode)
-            rotateNode.eulerAngles.y = totalAngle / 180 * .pi //旋转跟节点来指明方向
+            rotateNode.eulerAngles.y = moveAngle / 180 * .pi //旋转跟节点来指明方向
             
             self.navLastNodeArray.append(navigationNode)
             
