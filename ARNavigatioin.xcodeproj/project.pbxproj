@@ -17,6 +17,9 @@
 		5F2CFAA820AAAB3E00C8E415 /* golden_century_3.png in Resources */ = {isa = PBXBuildFile; fileRef = 5F2CFAA420AAAB3E00C8E415 /* golden_century_3.png */; };
 		5F2CFAB020AAD86100C8E415 /* DrawNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F2CFAAF20AAD86100C8E415 /* DrawNavigation.swift */; };
 		5F2CFAB220AADB1800C8E415 /* NavigationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F2CFAB120AADB1800C8E415 /* NavigationModel.swift */; };
+		5F54CC2020B6A49600E6CAC9 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F54CC1F20B6A49600E6CAC9 /* MainViewController.swift */; };
+		5F54CC2220B6A7B700E6CAC9 /* ArrowViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F54CC2120B6A7B700E6CAC9 /* ArrowViewController.swift */; };
+		5F54CC2420B6AB0D00E6CAC9 /* 888.scn in Resources */ = {isa = PBXBuildFile; fileRef = 5F54CC2320B6AB0D00E6CAC9 /* 888.scn */; };
 		5F635C152099A575006B71B5 /* compass.png in Resources */ = {isa = PBXBuildFile; fileRef = 5F635C122099A575006B71B5 /* compass.png */; };
 		5F635C162099A575006B71B5 /* compass@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5F635C132099A575006B71B5 /* compass@3x.png */; };
 		5F635C172099A575006B71B5 /* compass@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5F635C142099A575006B71B5 /* compass@2x.png */; };
@@ -53,6 +56,9 @@
 		5F2CFAA420AAAB3E00C8E415 /* golden_century_3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = golden_century_3.png; sourceTree = "<group>"; };
 		5F2CFAAF20AAD86100C8E415 /* DrawNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawNavigation.swift; sourceTree = "<group>"; };
 		5F2CFAB120AADB1800C8E415 /* NavigationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationModel.swift; sourceTree = "<group>"; };
+		5F54CC1F20B6A49600E6CAC9 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
+		5F54CC2120B6A7B700E6CAC9 /* ArrowViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrowViewController.swift; sourceTree = "<group>"; };
+		5F54CC2320B6AB0D00E6CAC9 /* 888.scn */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = 888.scn; sourceTree = "<group>"; };
 		5F635C122099A575006B71B5 /* compass.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = compass.png; sourceTree = "<group>"; };
 		5F635C132099A575006B71B5 /* compass@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "compass@3x.png"; sourceTree = "<group>"; };
 		5F635C142099A575006B71B5 /* compass@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "compass@2x.png"; sourceTree = "<group>"; };
@@ -122,12 +128,14 @@
 		5FDDCBB82089D1570030B40D /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
+				5F54CC1F20B6A49600E6CAC9 /* MainViewController.swift */,
 				5F2CFA9D20AA92A300C8E415 /* ARSCNBaseViewController.swift */,
 				5F11F194209051820077683A /* ARSCNView+Extension.swift */,
 				5F11F195209051820077683A /* SCNVector3+Extention.swift */,
 				5F2CFA9F20AA932800C8E415 /* ARNavigationViewController.swift */,
 				5F2CFAAF20AAD86100C8E415 /* DrawNavigation.swift */,
 				5F2CFAB120AADB1800C8E415 /* NavigationModel.swift */,
+				5F54CC2120B6A7B700E6CAC9 /* ArrowViewController.swift */,
 				5FDDCBB92089D1570030B40D /* images */,
 				5FDDCBBA2089D1570030B40D /* models */,
 				5FDDCBBB2089D1570030B40D /* views */,
@@ -138,6 +146,7 @@
 		5FDDCBB92089D1570030B40D /* images */ = {
 			isa = PBXGroup;
 			children = (
+				5F54CC2320B6AB0D00E6CAC9 /* 888.scn */,
 				5FC6EF0020B2B77100337629 /* car_1.jpg */,
 				5FC6EF0120B2B77100337629 /* car_2.jpg */,
 				5FC6EF0220B2B77100337629 /* car_3.jpg */,
@@ -259,6 +268,7 @@
 				5F635C162099A575006B71B5 /* compass@3x.png in Resources */,
 				5FDDCBD12089F0C80030B40D /* navigation_down@3x.png in Resources */,
 				5FDDCBD42089F0C80030B40D /* navigation_right@2x.png in Resources */,
+				5F54CC2420B6AB0D00E6CAC9 /* 888.scn in Resources */,
 				5FDDCBAA2089CC760030B40D /* Assets.xcassets in Resources */,
 				5FDDCBD22089F0C80030B40D /* navigation_up@3x.png in Resources */,
 				5F2CFAA720AAAB3E00C8E415 /* golden_century_1.png in Resources */,
@@ -273,12 +283,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5F54CC2220B6A7B700E6CAC9 /* ArrowViewController.swift in Sources */,
 				5F2CFAA020AA932800C8E415 /* ARNavigationViewController.swift in Sources */,
 				5F2CFAB220AADB1800C8E415 /* NavigationModel.swift in Sources */,
 				5FDDCBB72089CF070030B40D /* Plane.swift in Sources */,
 				5F11F197209051820077683A /* SCNVector3+Extention.swift in Sources */,
 				5F2CFA9E20AA92A300C8E415 /* ARSCNBaseViewController.swift in Sources */,
 				5F11F196209051820077683A /* ARSCNView+Extension.swift in Sources */,
+				5F54CC2020B6A49600E6CAC9 /* MainViewController.swift in Sources */,
 				5F2CFAB020AAD86100C8E415 /* DrawNavigation.swift in Sources */,
 				5FDDCBA32089CC740030B40D /* AppDelegate.swift in Sources */,
 			);
@@ -418,6 +430,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = JYRL84HER3;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/ARNavigatioin",
+				);
 				INFOPLIST_FILE = ARNavigatioin/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -437,6 +453,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = JYRL84HER3;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/ARNavigatioin",
+				);
 				INFOPLIST_FILE = ARNavigatioin/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
 				LD_RUNPATH_SEARCH_PATHS = (
