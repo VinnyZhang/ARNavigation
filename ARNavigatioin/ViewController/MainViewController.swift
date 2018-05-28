@@ -17,7 +17,7 @@ class MainViewController: UIViewController {
         
         let navBtn = UIButton(frame: CGRect(x: 50.0, y: 100.0, width: self.view.frame.size.width - 100.0, height: 50.0))
         self.view.addSubview(navBtn)
-        navBtn.setTitle("扫图后重新确定世界坐标系，根据方向加载导航", for: .normal)
+        navBtn.setTitle("根据方向加载导航", for: .normal)
         navBtn.setTitleColor(UIColor.blue, for: .normal)
         
         navBtn.addTarget(self, action: #selector(navClick), for: .touchUpInside)
@@ -29,6 +29,20 @@ class MainViewController: UIViewController {
         
         arrowBtn.addTarget(self, action: #selector(arrowClick), for: .touchUpInside)
         
+        let recordLocationBtn = UIButton(frame: CGRect(x: 50.0, y: 280.0, width: self.view.frame.size.width - 100.0, height: 50.0))
+        self.view.addSubview(recordLocationBtn)
+        recordLocationBtn.setTitle("记录位置信息", for: .normal)
+        recordLocationBtn.setTitleColor(UIColor.blue, for: .normal)
+        recordLocationBtn.addTarget(self, action: #selector(recordLocation), for: .touchUpInside)
+        
+        
+        let showRecordVectorBtn = UIButton(frame: CGRect(x: 50.0, y: 350.0, width: self.view.frame.size.width - 100.0, height: 50.0))
+        self.view.addSubview(showRecordVectorBtn)
+        showRecordVectorBtn.setTitle("展示记录的导航", for: .normal)
+        showRecordVectorBtn.setTitleColor(UIColor.blue, for: .normal)
+        showRecordVectorBtn.addTarget(self, action: #selector(showRecordVector), for: .touchUpInside)
+        
+        
         
     }
 
@@ -37,6 +51,10 @@ class MainViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    @objc func showRecordVector() {
+        let recordVector = ARNavigationVectorViewController()
+        self.navigationController?.pushViewController(recordVector, animated: true)
+    }
 
      @objc func navClick() {
         let navController = ARNavigationViewController()
@@ -46,6 +64,11 @@ class MainViewController: UIViewController {
     @objc func arrowClick() {
         let arrowController = ArrowViewController()
         self.navigationController?.pushViewController(arrowController, animated: true)
+    }
+    
+    @objc func recordLocation() {
+        let recordLocationController = RecordLocationViewController()
+        self.navigationController?.pushViewController(recordLocationController, animated: true)
     }
 
 }

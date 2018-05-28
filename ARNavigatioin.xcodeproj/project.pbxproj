@@ -17,6 +17,8 @@
 		5F2CFAA820AAAB3E00C8E415 /* golden_century_3.png in Resources */ = {isa = PBXBuildFile; fileRef = 5F2CFAA420AAAB3E00C8E415 /* golden_century_3.png */; };
 		5F2CFAB020AAD86100C8E415 /* DrawNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F2CFAAF20AAD86100C8E415 /* DrawNavigation.swift */; };
 		5F2CFAB220AADB1800C8E415 /* NavigationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F2CFAB120AADB1800C8E415 /* NavigationModel.swift */; };
+		5F4E86A720BB754C001B62A8 /* RecordLocationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F4E86A620BB754C001B62A8 /* RecordLocationViewController.swift */; };
+		5F4E86A920BBCE5B001B62A8 /* ARNavigationVectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F4E86A820BBCE5B001B62A8 /* ARNavigationVectorViewController.swift */; };
 		5F54CC2020B6A49600E6CAC9 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F54CC1F20B6A49600E6CAC9 /* MainViewController.swift */; };
 		5F54CC2220B6A7B700E6CAC9 /* ArrowViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F54CC2120B6A7B700E6CAC9 /* ArrowViewController.swift */; };
 		5F54CC2420B6AB0D00E6CAC9 /* 888.scn in Resources */ = {isa = PBXBuildFile; fileRef = 5F54CC2320B6AB0D00E6CAC9 /* 888.scn */; };
@@ -56,6 +58,8 @@
 		5F2CFAA420AAAB3E00C8E415 /* golden_century_3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = golden_century_3.png; sourceTree = "<group>"; };
 		5F2CFAAF20AAD86100C8E415 /* DrawNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawNavigation.swift; sourceTree = "<group>"; };
 		5F2CFAB120AADB1800C8E415 /* NavigationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationModel.swift; sourceTree = "<group>"; };
+		5F4E86A620BB754C001B62A8 /* RecordLocationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordLocationViewController.swift; sourceTree = "<group>"; };
+		5F4E86A820BBCE5B001B62A8 /* ARNavigationVectorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARNavigationVectorViewController.swift; sourceTree = "<group>"; };
 		5F54CC1F20B6A49600E6CAC9 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		5F54CC2120B6A7B700E6CAC9 /* ArrowViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrowViewController.swift; sourceTree = "<group>"; };
 		5F54CC2320B6AB0D00E6CAC9 /* 888.scn */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = 888.scn; sourceTree = "<group>"; };
@@ -128,6 +132,8 @@
 		5FDDCBB82089D1570030B40D /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
+				5F4E86A820BBCE5B001B62A8 /* ARNavigationVectorViewController.swift */,
+				5F4E86A620BB754C001B62A8 /* RecordLocationViewController.swift */,
 				5F54CC1F20B6A49600E6CAC9 /* MainViewController.swift */,
 				5F2CFA9D20AA92A300C8E415 /* ARSCNBaseViewController.swift */,
 				5F11F194209051820077683A /* ARSCNView+Extension.swift */,
@@ -287,11 +293,13 @@
 				5F2CFAA020AA932800C8E415 /* ARNavigationViewController.swift in Sources */,
 				5F2CFAB220AADB1800C8E415 /* NavigationModel.swift in Sources */,
 				5FDDCBB72089CF070030B40D /* Plane.swift in Sources */,
+				5F4E86A720BB754C001B62A8 /* RecordLocationViewController.swift in Sources */,
 				5F11F197209051820077683A /* SCNVector3+Extention.swift in Sources */,
 				5F2CFA9E20AA92A300C8E415 /* ARSCNBaseViewController.swift in Sources */,
 				5F11F196209051820077683A /* ARSCNView+Extension.swift in Sources */,
 				5F54CC2020B6A49600E6CAC9 /* MainViewController.swift in Sources */,
 				5F2CFAB020AAD86100C8E415 /* DrawNavigation.swift in Sources */,
+				5F4E86A920BBCE5B001B62A8 /* ARNavigationVectorViewController.swift in Sources */,
 				5FDDCBA32089CC740030B40D /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

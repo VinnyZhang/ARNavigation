@@ -17,6 +17,7 @@ class DrawNavigation: NSObject {
     var backRice: Float!//向后移动的距离
     var navArray = Array<NavigationModel>()//导航数据数组
     var navLastNodeArray = Array<SCNNode>()//每个方向上最后添加的导航节点
+    var vectorNavArray = Array<SCNVector3>()//向量导航
     
     /// 初始化
     ///
@@ -106,6 +107,83 @@ class DrawNavigation: NSObject {
             superNodeCenterX = navModel.wRice / 2
         }
         
+    }
+    
+    /// 展示导航
+    ///
+    /// - Parameter vectorArray:
+    public func showNavigation(vectorArray: Array<SCNVector3>) {
+            
+        for model in vectorArray {
+            self.vectorNavArray.append(model)
+        }
+        
+        /**
+         Y轴：垂直方向，正方向朝上
+         X轴：东西方向，正方向朝西
+         Z轴：南北方向，正方向朝北
+         每个方向上的导航节点添加到一个（0，0，0）的父节点上，方便之后的旋转操作
+         添加节点时全部添加到X轴的正方向上，之后再根据方向进行旋转操作
+         **/
+        
+        let rotateGeometry = SCNBox(width: 0.0, height: 0.0, length: 0.0, chamferRadius: 0.0)//旋转节点几何形状
+        
+        let navMaterial = SCNMaterial()//导航节点的素材
+        let navImage = UIImage(named: "navigation_right")
+        navMaterial.diffuse.contents = navImage
+        navMaterial.lightingModel = .physicallyBased
+        
+        var totalAngle: Float = 0.0//旋转节点旋转的总角度
+        var superNodeCenterX: Float = 0.0 //父节点中心点X轴偏移的位置
+        
+        for navModel in self.vectorNavArray {//循环取出方向导航数据，来加载世界导航节点
+            
+            
+            
+            var moveAngle: Float = 0.0
+            
+            //                if abs(totalAngle) > navModel.westDD {
+            //                    let tempT = abs(totalAngle) - navModel.westDD
+            //                    moveAngle = -tempT
+            //                    totalAngle = navModel.westDD
+            //                }
+            //                else {
+            //                    let tempT = navModel.westDD - abs(totalAngle)
+            //                    moveAngle = tempT
+            //                    totalAngle = navModel.westDD
+            //                }
+            
+            let rotateNode = SCNNode(geometry: rotateGeometry)
+            
+            var wRice = 0.0
+            
+            if navLastNodeArray.count > 0 {
+                
+                rotateNode.position = SCNVector3Make(0.0, 0.0, 0.0)
+                
+                let navNode = navLastNodeArray.last
+                navNode?.addChildNode(rotateNode)
+                
+                wRice = Double(sqrt(pow(navModel.x - (navNode?.position.x)!,2.0) + pow(navModel.z - (navNode?.position.z)!, 2.0)))
+                
+            }
+            else{
+                rotateNode.position = SCNVector3Make(0.0, 0.0, 0.0)
+                wRice = Double(sqrt(pow(navModel.x,2.0) + pow(navModel.z, 2.0)))
+                self.scenView.scene.rootNode.addChildNode(rotateNode)
+            }
+            
+            let navigationGeometry = SCNBox(width: CGFloat(wRice), height: 0.001, length: 0.2, chamferRadius: 0.0)
+            navigationGeometry.materials = [navMaterial]
+            let navigationNode = SCNNode(geometry: navigationGeometry)
+            navigationNode.position = SCNVector3Make(Float(wRice/2.0), 0.0, 0.0)
+            rotateNode.addChildNode(navigationNode)
+            rotateNode.eulerAngles.y = moveAngle / 180 * .pi //旋转跟节点来指明方向
+            
+            self.navLastNodeArray.append(navigationNode)
+            
+            
+        }
     }
     
     
