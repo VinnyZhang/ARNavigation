@@ -133,52 +133,100 @@ class DrawNavigation: NSObject {
         navMaterial.diffuse.contents = navImage
         navMaterial.lightingModel = .physicallyBased
         
-        var totalAngle: Float = 0.0//旋转节点旋转的总角度
-        var superNodeCenterX: Float = 0.0 //父节点中心点X轴偏移的位置
+        var depth = 0.0 //Y轴上的偏移(高度)
+        var tanPre:Float = 0.0//上一个节点的角度
         
-        for navModel in self.vectorNavArray {//循环取出方向导航数据，来加载世界导航节点
+        for navModel in self.vectorNavArray {//循环取出向量导航数据，来加载世界导航节点
             
+            var moveAngle: Float = 0.0//子节点相对于父节点旋转的角度
             
+            let rotateNode = SCNNode(geometry: rotateGeometry)//每个向量的父节点,用于旋转方向
             
-            var moveAngle: Float = 0.0
-            
-            //                if abs(totalAngle) > navModel.westDD {
-            //                    let tempT = abs(totalAngle) - navModel.westDD
-            //                    moveAngle = -tempT
-            //                    totalAngle = navModel.westDD
-            //                }
-            //                else {
-            //                    let tempT = navModel.westDD - abs(totalAngle)
-            //                    moveAngle = tempT
-            //                    totalAngle = navModel.westDD
-            //                }
-            
-            let rotateNode = SCNNode(geometry: rotateGeometry)
-            
-            var wRice = 0.0
+            var wRice:Float = 0.0//X周上的长度
             
             if navLastNodeArray.count > 0 {
                 
-                rotateNode.position = SCNVector3Make(0.0, 0.0, 0.0)
+                depth = 0.0
                 
-                let navNode = navLastNodeArray.last
-                navNode?.addChildNode(rotateNode)
+                let previousNavNode = navLastNodeArray.last //获取到上一个节点，将下一个向量的根节点（旋转节点）添加到该节点中
                 
-                wRice = Double(sqrt(pow(navModel.x - (navNode?.position.x)!,2.0) + pow(navModel.z - (navNode?.position.z)!, 2.0)))
+                rotateNode.position = SCNVector3Make((previousNavNode?.position.x)!/2, 0.0, 0.0)
+                
+                previousNavNode?.addChildNode(rotateNode)
+                
+                wRice = sqrt(pow((navModel.x - (previousNavNode?.position.x)!),2.0) + pow((navModel.z - (previousNavNode?.position.z)!), 2.0))
                 
             }
             else{
+                depth = 1.0
                 rotateNode.position = SCNVector3Make(0.0, 0.0, 0.0)
-                wRice = Double(sqrt(pow(navModel.x,2.0) + pow(navModel.z, 2.0)))
+                wRice = sqrt(pow(navModel.x,2.0) + pow(navModel.z, 2.0))
                 self.scenView.scene.rootNode.addChildNode(rotateNode)
+                
             }
+            
+            //计算偏转的角度
+            var tanCurrent:Float = 0.0
+            if navLastNodeArray.count > 0 {
+                let previousNavNode = navLastNodeArray.last //获取到上一个节点，将下一个向量的根节点（旋转节点）添加到该节点中
+                
+                let z = navModel.z - (previousNavNode?.position.z)!
+                let x = navModel.x - (previousNavNode?.position.x)!
+                tanCurrent = z / x
+                if previousNavNode!.position.z > 0.0 && previousNavNode!.position.x > 0.0 {//第二象限
+                    
+                    if x > 0 {
+                        moveAngle = 90 * (tanPre - tanCurrent)
+                    }
+                    
+                    else if x < 0{
+                        if z < 0 {
+                            moveAngle = 90 + tanPre*90
+                        }
+                        else if z > 0 {
+                            moveAngle = 90*(tanPre + fabs(tanCurrent)) - 180
+                        }
+                        else if z == 0 {
+                            moveAngle = 90 * tanPre - 180
+                        }
+                    }
+                    else {
+                        if z > 0 {
+                            moveAngle = 90 * tanPre - 90
+                        }
+                        else if z < 0 {
+                            moveAngle = 90 * tanPre + 90
+                        }
+                    }
+                    
+                }
+                
+                
+            }
+            else {
+                tanCurrent = fabs(navModel.z) / fabs(navModel.x)
+            }
+            
+            
+            print("tanPre \(tanPre)  tanCurrent \(tanCurrent) ")
+            if tanPre > tanCurrent {
+                moveAngle = 90 * (tanPre - tanCurrent)
+            }
+            else {
+                moveAngle = 90 * (tanPre - tanCurrent)
+            }
+            
+            tanPre = tanCurrent
             
             let navigationGeometry = SCNBox(width: CGFloat(wRice), height: 0.001, length: 0.2, chamferRadius: 0.0)
             navigationGeometry.materials = [navMaterial]
             let navigationNode = SCNNode(geometry: navigationGeometry)
-            navigationNode.position = SCNVector3Make(Float(wRice/2.0), 0.0, 0.0)
+            navigationNode.position = SCNVector3Make(wRice/2.0, Float(-depth), 0.0)
+            
             rotateNode.addChildNode(navigationNode)
             rotateNode.eulerAngles.y = moveAngle / 180 * .pi //旋转跟节点来指明方向
+            
+            print("navNode \(navigationNode.position)  moveAngle \(moveAngle)")
             
             self.navLastNodeArray.append(navigationNode)
             

@@ -145,9 +145,16 @@ class RecordLocationViewController: ARSCNBaseViewController {
             timer.invalidate()
             timer = nil
         }
-        let defaults = UserDefaults.standard
-        let data: Data = NSKeyedArchiver.archivedData(withRootObject: locationArray)
-        defaults.set(data, forKey: "RecordLocation")
+        if locationArray.count > 0 {
+            let vector = locationArray[0]
+            if vector.x == 0.0 && vector.y == 0.0 && vector.z == 0.0 {
+                locationArray.removeFirst()//移除跟节点（0，0，0）
+            }
+            let defaults = UserDefaults.standard
+            let data: Data = NSKeyedArchiver.archivedData(withRootObject: locationArray)
+            defaults.set(data, forKey: "RecordLocation")
+        }
+        
         
     }
     
@@ -232,30 +239,27 @@ class RecordLocationViewController: ARSCNBaseViewController {
     private func recordLocation() {
         let position = SCNVector3.positionTransform((self.gameView.session.currentFrame?.camera.transform)!)
         
-        
+        if self.locationArray.count == 0 {//添加跟节点
+            let orignalPosition = SCNVector3Make(0.0, 0.0, 0.0)
+            self.locationArray.append(orignalPosition)
+        }
         
         if let previousPosition = self.locationArray.last {
             if self.canRecordLocation(previousPosition: previousPosition, currentPosition: position) {
                 self.locationArray.append(position)
-                print("recordLocation \(position)")
+                self.stopRecordLocationBtn.setTitle("节点数 \(self.locationArray.count - 1)", for: .normal)
             }
         }
-        else {
-            self.locationArray.append(position)
-            print("recordLocation \(position)")
-        }
+
     }
     
     /// 是否符合条件，以便记录摄像头位置
     private func canRecordLocation(previousPosition: SCNVector3,currentPosition: SCNVector3) -> Bool {
         var canRecord = false
-        
-        let distance = sqrt(pow(currentPosition.x, 2.0) + pow(currentPosition.z, 2.0)) - sqrt(pow(previousPosition.x, 2.0) + pow(previousPosition.z, 2.0))
-        if distance > 1.0 {
+        let distance = sqrt(pow((currentPosition.x - previousPosition.x),2.0) + pow((currentPosition.z - previousPosition.z), 2.0))//当前节点于上一个节点相差的距离
+        if distance > 1.5 {
             canRecord = true
         }
-        
-        
         return canRecord
     }
     

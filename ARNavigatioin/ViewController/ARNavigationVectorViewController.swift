@@ -35,6 +35,7 @@ class ARNavigationVectorViewController: ARSCNBaseViewController {
     
     var needResetOrignalWorld = false //是否需要重新设置世界原点
     
+    var navControl: DrawNavigation!//导航绘制类
     
     var distinationType: DistinationType!
     
@@ -116,7 +117,9 @@ class ARNavigationVectorViewController: ARSCNBaseViewController {
     
     /// 绘制导航
     private func goDrawNavigation() {
+        self.navControl = DrawNavigation(self.gameView)
         
+        self.navControl.showNavigation(vectorArray: locationArray)
     }
     
     /// 初始化视图
