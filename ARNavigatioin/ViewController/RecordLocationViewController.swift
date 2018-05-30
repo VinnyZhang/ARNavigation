@@ -257,7 +257,7 @@ class RecordLocationViewController: ARSCNBaseViewController {
     private func canRecordLocation(previousPosition: SCNVector3,currentPosition: SCNVector3) -> Bool {
         var canRecord = false
         let distance = sqrt(pow((currentPosition.x - previousPosition.x),2.0) + pow((currentPosition.z - previousPosition.z), 2.0))//当前节点于上一个节点相差的距离
-        if distance > 1.0 {
+        if distance > 0.5 {
             canRecord = true
         }
         return canRecord

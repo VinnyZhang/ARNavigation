@@ -149,11 +149,9 @@ class DrawNavigation: NSObject {
                 
                 let preNavVector = navVectorArray.last //获取到上一个节点，将下一个向量的根节点（旋转节点）添加到该节点中
                 
-                rotateNode.position = SCNVector3Make((preNavVector?.node.position.x)!/2, 0.0, 0.0)
+                rotateNode.position = SCNVector3Make((preNavVector?.node.position.x)!, 0.0, 0.0)
                 
                 preNavVector?.node.addChildNode(rotateNode)
-                
-                wRice = sqrt(pow(preNavVector!.vector.x,2.0) + pow(preNavVector!.vector.z, 2.0))
                 
             }
             else{
@@ -176,13 +174,18 @@ class DrawNavigation: NSObject {
                 orignalVector = previousNavNode!.orignalVector
                 let z = navModel.z - orignalVector.z
                 let x = navModel.x - orignalVector.x
+//                let z = navModel.z - previousNavNode!.node.position.z*2
+//                let x = navModel.x - previousNavNode!.node.position.x*2
                 currentDistanceVector.z = z
                 currentDistanceVector.x = x
                 tanCurrent = z / x
                 tanPre = previousNavNode!.vector.z / previousNavNode!.vector.x
                 
+                wRice = sqrt(pow((navModel.z - orignalVector.z), 2.0) + pow((navModel.x - orignalVector.x), 2.0))
+                
                 
                 if previousNavNode!.vector.z > 0.0 && previousNavNode!.vector.x > 0.0 {//第二象限
+                    print("第二象限")
                     if x > 0.0 {
                         moveAngle = 90 * (tanPre - tanCurrent)
                     }
@@ -208,6 +211,7 @@ class DrawNavigation: NSObject {
                     }
                 }
                 else if previousNavNode!.vector.z < 0.0 && previousNavNode!.vector.x > 0.0 {//第一象限
+                    print("第一象限")
                     if x > 0.0 {
                         moveAngle = 90 * (tanPre - tanCurrent)
                     }
@@ -232,6 +236,7 @@ class DrawNavigation: NSObject {
                     }
                 }
                 else if previousNavNode!.vector.z > 0.0 && previousNavNode!.vector.x < 0.0 {//第三象限
+                    print("第三象限")
                     if x > 0.0 {
                         if z > 0.0 {
                             moveAngle = 180 + 90 * (tanPre - tanCurrent)
@@ -264,6 +269,7 @@ class DrawNavigation: NSObject {
                     }
                 }
                 else if previousNavNode!.vector.z < 0.0 && previousNavNode!.vector.x < 0.0 {//第四象限
+                    print("第四象限")
                     if x > 0.0 {
                         if z < 0.0 {
                             moveAngle = 90 * (tanPre - tanCurrent) - 180
@@ -328,7 +334,7 @@ class DrawNavigation: NSObject {
 
             self.navVectorArray.append(navVectorN)
             
-            print("navNode \(navigationNode.position)  moveAngle \(moveAngle)")
+            print("navNode \(navigationNode.position)  moveAngle \(moveAngle)  vec \(currentDistanceVector) ,  orvec \(navModel)")
             
             
         }
