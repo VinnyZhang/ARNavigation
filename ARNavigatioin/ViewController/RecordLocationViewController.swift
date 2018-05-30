@@ -228,7 +228,7 @@ class RecordLocationViewController: ARSCNBaseViewController {
     /// 计时，每隔1s钟获取摄像头位置
     private func startTimer() {
         
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true, block: { (timers) in
+        timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true, block: { (timers) in
             self.recordLocation()
         })
         
@@ -257,7 +257,7 @@ class RecordLocationViewController: ARSCNBaseViewController {
     private func canRecordLocation(previousPosition: SCNVector3,currentPosition: SCNVector3) -> Bool {
         var canRecord = false
         let distance = sqrt(pow((currentPosition.x - previousPosition.x),2.0) + pow((currentPosition.z - previousPosition.z), 2.0))//当前节点于上一个节点相差的距离
-        if distance > 1.5 {
+        if distance > 1.0 {
             canRecord = true
         }
         return canRecord

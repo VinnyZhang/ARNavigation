@@ -17,11 +17,13 @@
 		5F2CFAA820AAAB3E00C8E415 /* golden_century_3.png in Resources */ = {isa = PBXBuildFile; fileRef = 5F2CFAA420AAAB3E00C8E415 /* golden_century_3.png */; };
 		5F2CFAB020AAD86100C8E415 /* DrawNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F2CFAAF20AAD86100C8E415 /* DrawNavigation.swift */; };
 		5F2CFAB220AADB1800C8E415 /* NavigationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F2CFAB120AADB1800C8E415 /* NavigationModel.swift */; };
+		5F2F15FA20BE554A0010C97A /* VectorNavNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F2F15F920BE554A0010C97A /* VectorNavNode.swift */; };
 		5F4E86A720BB754C001B62A8 /* RecordLocationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F4E86A620BB754C001B62A8 /* RecordLocationViewController.swift */; };
 		5F4E86A920BBCE5B001B62A8 /* ARNavigationVectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F4E86A820BBCE5B001B62A8 /* ARNavigationVectorViewController.swift */; };
 		5F54CC2020B6A49600E6CAC9 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F54CC1F20B6A49600E6CAC9 /* MainViewController.swift */; };
 		5F54CC2220B6A7B700E6CAC9 /* ArrowViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F54CC2120B6A7B700E6CAC9 /* ArrowViewController.swift */; };
 		5F54CC2420B6AB0D00E6CAC9 /* 888.scn in Resources */ = {isa = PBXBuildFile; fileRef = 5F54CC2320B6AB0D00E6CAC9 /* 888.scn */; };
+		5F56F4CA20BE8895000C2538 /* daohangjiantou.png in Resources */ = {isa = PBXBuildFile; fileRef = 5F56F4C920BE8895000C2538 /* daohangjiantou.png */; };
 		5F635C152099A575006B71B5 /* compass.png in Resources */ = {isa = PBXBuildFile; fileRef = 5F635C122099A575006B71B5 /* compass.png */; };
 		5F635C162099A575006B71B5 /* compass@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5F635C132099A575006B71B5 /* compass@3x.png */; };
 		5F635C172099A575006B71B5 /* compass@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5F635C142099A575006B71B5 /* compass@2x.png */; };
@@ -56,11 +58,13 @@
 		5F2CFAA420AAAB3E00C8E415 /* golden_century_3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = golden_century_3.png; sourceTree = "<group>"; };
 		5F2CFAAF20AAD86100C8E415 /* DrawNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawNavigation.swift; sourceTree = "<group>"; };
 		5F2CFAB120AADB1800C8E415 /* NavigationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationModel.swift; sourceTree = "<group>"; };
+		5F2F15F920BE554A0010C97A /* VectorNavNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VectorNavNode.swift; sourceTree = "<group>"; };
 		5F4E86A620BB754C001B62A8 /* RecordLocationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordLocationViewController.swift; sourceTree = "<group>"; };
 		5F4E86A820BBCE5B001B62A8 /* ARNavigationVectorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARNavigationVectorViewController.swift; sourceTree = "<group>"; };
 		5F54CC1F20B6A49600E6CAC9 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		5F54CC2120B6A7B700E6CAC9 /* ArrowViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrowViewController.swift; sourceTree = "<group>"; };
 		5F54CC2320B6AB0D00E6CAC9 /* 888.scn */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = 888.scn; sourceTree = "<group>"; };
+		5F56F4C920BE8895000C2538 /* daohangjiantou.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = daohangjiantou.png; sourceTree = "<group>"; };
 		5F635C122099A575006B71B5 /* compass.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = compass.png; sourceTree = "<group>"; };
 		5F635C132099A575006B71B5 /* compass@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "compass@3x.png"; sourceTree = "<group>"; };
 		5F635C142099A575006B71B5 /* compass@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "compass@2x.png"; sourceTree = "<group>"; };
@@ -138,6 +142,7 @@
 				5F2CFAAF20AAD86100C8E415 /* DrawNavigation.swift */,
 				5F2CFAB120AADB1800C8E415 /* NavigationModel.swift */,
 				5F54CC2120B6A7B700E6CAC9 /* ArrowViewController.swift */,
+				5F2F15F920BE554A0010C97A /* VectorNavNode.swift */,
 				5FDDCBB92089D1570030B40D /* images */,
 				5FDDCBBA2089D1570030B40D /* models */,
 				5FDDCBBB2089D1570030B40D /* views */,
@@ -148,6 +153,7 @@
 		5FDDCBB92089D1570030B40D /* images */ = {
 			isa = PBXGroup;
 			children = (
+				5F56F4C920BE8895000C2538 /* daohangjiantou.png */,
 				5F54CC2320B6AB0D00E6CAC9 /* 888.scn */,
 				5FC6EF0020B2B77100337629 /* car_1.jpg */,
 				5FC6EF0120B2B77100337629 /* car_2.jpg */,
@@ -258,6 +264,7 @@
 				5FDDCBDA2089F0C80030B40D /* navigation_left@3x.png in Resources */,
 				5FDDCBD32089F0C80030B40D /* navigation_down@2x.png in Resources */,
 				5FDDCBDB2089F0C80030B40D /* navigation_up@2x.png in Resources */,
+				5F56F4CA20BE8895000C2538 /* daohangjiantou.png in Resources */,
 				5FDDCBD92089F0C80030B40D /* navigation_up.png in Resources */,
 				5FC6EF0320B2B77100337629 /* car_1.jpg in Resources */,
 				5FDDCBBD2089D1B40030B40D /* vertical.png in Resources */,
@@ -291,6 +298,7 @@
 				5F11F196209051820077683A /* ARSCNView+Extension.swift in Sources */,
 				5F54CC2020B6A49600E6CAC9 /* MainViewController.swift in Sources */,
 				5F2CFAB020AAD86100C8E415 /* DrawNavigation.swift in Sources */,
+				5F2F15FA20BE554A0010C97A /* VectorNavNode.swift in Sources */,
 				5F4E86A920BBCE5B001B62A8 /* ARNavigationVectorViewController.swift in Sources */,
 				5FDDCBA32089CC740030B40D /* AppDelegate.swift in Sources */,
 			);
