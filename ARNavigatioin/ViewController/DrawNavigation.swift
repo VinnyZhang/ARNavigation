@@ -143,59 +143,73 @@ class DrawNavigation: NSObject {
             
             var wRice:Float = 0.0//X轴上的长度
             
-            if navVectorArray.count > 0 {
-                
+            //计算偏转的角度
+            var tanCurrent: Float = 0.0//当前新增节点Z/X角度
+            var tanPre: Float = 0.0// 前一个向量节点的Z/X角度
+            var currentDistanceVector: SCNVector3 = SCNVector3Make(0.0, 0.0, 0.0)//当前向量节点相对于父节点的坐标
+            
+            if navVectorArray.count > 0 {//向上一个向量节点中添加向量节点的根节点
                 depth = 0.0
-                
-                let preNavVector = navVectorArray.last //获取到上一个节点，将下一个向量的根节点（旋转节点）添加到该节点中
-                
-                rotateNode.position = SCNVector3Make((preNavVector?.node.position.x)!, 0.0, 0.0)
-                
-                preNavVector?.node.addChildNode(rotateNode)
-                
+                if let preNavVector = navVectorArray.last {//获取到上一个节点，将下一个向量的根节点（旋转节点）添加到该节点中
+                    rotateNode.position = SCNVector3Make(preNavVector.node.position.x, 0.0, 0.0)
+                    preNavVector.node.addChildNode(rotateNode)
+                }
             }
-            else{
+            else{//在世界原点添加向量根节点
                 depth = 1.0
                 rotateNode.position = SCNVector3Make(0.0, 0.0, 0.0)
-                wRice = sqrt(pow(navModel.x,2.0) + pow(navModel.z, 2.0))
                 self.scenView.scene.rootNode.addChildNode(rotateNode)
             }
             
-            //计算偏转的角度
-            var tanCurrent: Float = 0.0//当前新增节点的角度
-            var tanPre: Float = 0.0// 前一个节点的角度
-            var currentDistanceVector: SCNVector3 = SCNVector3Make(0.0, 0.0, 0.0)
-            var orignalVector = SCNVector3Make(0.0, 0.0, 0.0)
+            print("-----------------------------------------------------")
             
             if navVectorArray.count > 0 {//含有父节点
                 
-                let previousNavNode = navVectorArray.last //获取到上一个节点，将下一个向量的根节点（旋转节点）添加到该节点中
+                guard let previousNavNode = navVectorArray.last else {//获取到上一个节点，将下一个向量的根节点（旋转节点）添加到该节点中
+                    return
+                }
                 
-                orignalVector = previousNavNode!.orignalVector
-                let z = navModel.z - orignalVector.z
-                let x = navModel.x - orignalVector.x
-//                let z = navModel.z - previousNavNode!.node.position.z*2
-//                let x = navModel.x - previousNavNode!.node.position.x*2
+                
+                let z = navModel.z - previousNavNode.orignalVector.z
+                let x = navModel.x - previousNavNode.orignalVector.x
+                
                 currentDistanceVector.z = z
                 currentDistanceVector.x = x
-                tanCurrent = z / x
-                tanPre = previousNavNode!.vector.z / previousNavNode!.vector.x
+                tanCurrent = fabs(z) / (fabs(x) + fabs(z))
+                tanPre = fabs(previousNavNode.vector.z) / (fabs(previousNavNode.vector.x) + fabs(previousNavNode.vector.z))
                 
-                wRice = sqrt(pow((navModel.z - orignalVector.z), 2.0) + pow((navModel.x - orignalVector.x), 2.0))
+                wRice = sqrt(pow((navModel.z - previousNavNode.orignalVector.z), 2.0) + pow((navModel.x - previousNavNode.orignalVector.x), 2.0))
                 
                 
-                if previousNavNode!.vector.z > 0.0 && previousNavNode!.vector.x > 0.0 {//第二象限
+                if previousNavNode.vector.z > 0.0 && previousNavNode.vector.x > 0.0 {//第二象限
                     print("第二象限")
                     if x > 0.0 {
-                        moveAngle = 90 * (tanPre - tanCurrent)
+                        if z < 0.0 {
+                            moveAngle = 90 * (tanPre + tanCurrent)
+                        }
+                        else if z > 0.0 {
+                            if tanCurrent >= tanPre {
+                                moveAngle = 90 * (tanCurrent - tanPre)
+                            }
+                            else {
+                                moveAngle = 90 * (tanCurrent - tanPre)
+                            }
+                        }
+                        else {
+                            moveAngle = tanPre
+                        }
                     }
-                    
                     else if x < 0.0 {
                         if z < 0.0 {
-                            moveAngle = 180 + 90 * (tanPre - tanCurrent)
+                            if tanCurrent >= tanPre {
+                                moveAngle = 180 + 90 * (tanPre - tanCurrent)
+                            }
+                            else {
+                                moveAngle = 90 * (tanPre - tanCurrent) - 180
+                            }
                         }
-                        else if z > 0 {
-                            moveAngle = 90*(tanPre - tanCurrent) - 180
+                        else if z > 0.0 {
+                            moveAngle = 90 * (tanPre + tanCurrent) - 180
                         }
                         else if z == 0 {
                             moveAngle = 90 * tanPre - 180
@@ -210,72 +224,105 @@ class DrawNavigation: NSObject {
                         }
                     }
                 }
-                else if previousNavNode!.vector.z < 0.0 && previousNavNode!.vector.x > 0.0 {//第一象限
+                else if previousNavNode.vector.z < 0.0 && previousNavNode.vector.x > 0.0 {//第一象限
                     print("第一象限")
                     if x > 0.0 {
-                        moveAngle = 90 * (tanPre - tanCurrent)
+                        if z < 0.0 {
+                            if tanCurrent >= tanPre {
+                                moveAngle = 90 * (tanCurrent - tanPre)
+                            }
+                            else {
+                                moveAngle = 90 * (tanCurrent - tanPre)
+                            }
+                        }
+                        else if z > 0.0 {
+                            moveAngle = -(90 * (tanCurrent + tanPre))
+                        }
+                        else {
+                            moveAngle = -(90 * tanPre)
+                        }
                     }
                     else if x < 0.0 {
                         if z < 0.0 {
-                            moveAngle = 90.0 * (tanCurrent - tanPre) - 180.0
+                            moveAngle = 180 - 90 * (tanCurrent + tanPre)
                         }
                         else if z > 0.0 {
-                            moveAngle = 90 - 90 * (tanPre + tanCurrent)
+                            if tanCurrent >= tanPre {
+                                moveAngle = 90 * (tanCurrent - tanPre) - 180
+                            }
+                            else {
+                                moveAngle = 180 + 90 * (tanCurrent - tanPre)
+                            }
                         }
                         else {
-                            moveAngle = 90 * tanPre - 180
+                            moveAngle = 180 - 90 * tanPre
                         }
                     }
                     else {
                         if z > 0.0 {
-                            moveAngle = 90 + tanPre * 90
+                            moveAngle = -(90 + tanPre * 90)
                         }
                         else if z < 0.0 {
-                            moveAngle = 90 * tanPre - 90
+                            moveAngle = 90 - 90 * tanPre
                         }
                     }
                 }
-                else if previousNavNode!.vector.z > 0.0 && previousNavNode!.vector.x < 0.0 {//第三象限
+                else if previousNavNode.vector.z > 0.0 && previousNavNode.vector.x < 0.0 {//第三象限
                     print("第三象限")
                     if x > 0.0 {
                         if z > 0.0 {
-                            moveAngle = 180 + 90 * (tanPre - tanCurrent)
+                            moveAngle = 180 - 90 * tanCurrent
                         }
                         else if z < 0.0 {
-                            moveAngle = 180 + 90 * tanPre
+                            if tanCurrent >= tanPre {
+                                moveAngle = 90 * (tanCurrent - tanPre) - 180
+                            }
+                            else {
+                                moveAngle = 180 - 90 * (tanPre - tanCurrent)
+                            }
                         }
                         else {
-                            moveAngle = 180 + 90 * tanPre
+                            moveAngle = 180 - 90 * tanPre
                         }
                     }
                     else if x < 0.0 {
                         if z < 0.0 {
-                            moveAngle = 90 * (tanPre - tanCurrent)
+                            moveAngle = -(90 * (tanPre + tanCurrent))
                         }
                         else if z > 0.0 {
-                            moveAngle = 90 * (tanPre - tanCurrent)
+                            if tanCurrent >= tanPre {
+                                moveAngle = 90 * (tanCurrent - tanPre)
+                            }
+                            else {
+                                moveAngle = 90 * (tanCurrent - tanPre)
+                            }
                         }
                         else {
-                            moveAngle = -(90 + 90 * (tanPre))
+                            moveAngle = -(90 * (tanPre))
                         }
                     }
                     else {
                         if z < 0.0 {
-                            moveAngle = 90 * tanPre - 90
+                            moveAngle = -(90 * tanPre + 90)
                         }
                         else {
-                            moveAngle = 90 + 90 * tanPre
+                            moveAngle = 90 - 90 * tanPre
                         }
                     }
                 }
-                else if previousNavNode!.vector.z < 0.0 && previousNavNode!.vector.x < 0.0 {//第四象限
+                else if previousNavNode.vector.z < 0.0 && previousNavNode.vector.x < 0.0 {//第四象限
                     print("第四象限")
                     if x > 0.0 {
                         if z < 0.0 {
-                            moveAngle = 90 * (tanPre - tanCurrent) - 180
+                            moveAngle = 90 * (tanPre + tanCurrent) - 180
                         }
                         else if z > 0.0 {
-                            moveAngle = 90 * (tanPre - tanCurrent) - 180
+                            if tanCurrent >= tanPre {
+                                moveAngle = 90 * (tanPre - tanCurrent) + 180
+                            }
+                            else {
+                                moveAngle = 90 * (tanPre - tanCurrent) - 180
+                            }
                         }
                         else {
                             moveAngle = 90 * tanPre - 180
@@ -283,10 +330,15 @@ class DrawNavigation: NSObject {
                     }
                     else if x < 0.0 {
                         if z > 0.0 {
-                            moveAngle = 90 * (tanPre - tanCurrent)
+                            moveAngle = 90 * (tanPre + tanCurrent)
                         }
                         else if z < 0.0 {
-                            moveAngle = 90 * (tanCurrent - tanPre)
+                            if tanCurrent >= tanPre {
+                                moveAngle = 90 * (tanCurrent - tanPre)
+                            }
+                            else {
+                                moveAngle = 90 * (tanPre - tanCurrent)
+                            }
                         }
                         else {
                             moveAngle = 90 * tanPre
@@ -304,17 +356,24 @@ class DrawNavigation: NSObject {
                 
             }
             else {//首节点
-                tanCurrent = navModel.z/navModel.x
-                if navModel.z < 0.0 && navModel.x > 0.0 {
-                    moveAngle = -90 * tanCurrent
+                
+                wRice = sqrt(pow(navModel.x,2.0) + pow(navModel.z, 2.0))
+                
+                currentDistanceVector.z = navModel.z
+                currentDistanceVector.x = navModel.x
+                
+                tanCurrent = fabs(navModel.z)/(fabs(navModel.x) + fabs(navModel.z))
+                
+                if navModel.z < 0.0 && navModel.x > 0.0 {//第一象限
+                    moveAngle = (90 * tanCurrent)
                 }
-                else if navModel.z > 0.0 && navModel.x > 0.0 {
+                else if navModel.z > 0.0 && navModel.x > 0.0 {//第二象限
                     moveAngle = -(90 * tanCurrent)
                 }
-                else if navModel.z > 0.0 && navModel.x < 0.0 {
-                    moveAngle = -(180 + 90*tanCurrent)
+                else if navModel.z > 0.0 && navModel.x < 0.0 {//第三象限
+                    moveAngle = 90*tanCurrent - 180
                 }
-                else {
+                else {//第四象限
                     moveAngle = 180 - 90 * tanCurrent
                 }
             }
@@ -334,7 +393,7 @@ class DrawNavigation: NSObject {
 
             self.navVectorArray.append(navVectorN)
             
-            print("navNode \(navigationNode.position)  moveAngle \(moveAngle)  vec \(currentDistanceVector) ,  orvec \(navModel)")
+            print("navNode \(navigationNode.position)  moveAngle \(moveAngle)  jiedian_vec \(currentDistanceVector) ,  orignal_vec \(navModel)   tanP \(tanPre)  tanC \(tanCurrent)")
             
             
         }

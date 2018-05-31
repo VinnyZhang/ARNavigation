@@ -150,9 +150,11 @@ class RecordLocationViewController: ARSCNBaseViewController {
             if vector.x == 0.0 && vector.y == 0.0 && vector.z == 0.0 {
                 locationArray.removeFirst()//移除跟节点（0，0，0）
             }
+            
             let defaults = UserDefaults.standard
             let data: Data = NSKeyedArchiver.archivedData(withRootObject: locationArray)
             defaults.set(data, forKey: "RecordLocation")
+            self.stopRecordLocationBtn.setTitle("记录结束", for: .normal)
         }
         
         
@@ -257,7 +259,7 @@ class RecordLocationViewController: ARSCNBaseViewController {
     private func canRecordLocation(previousPosition: SCNVector3,currentPosition: SCNVector3) -> Bool {
         var canRecord = false
         let distance = sqrt(pow((currentPosition.x - previousPosition.x),2.0) + pow((currentPosition.z - previousPosition.z), 2.0))//当前节点于上一个节点相差的距离
-        if distance > 0.5 {
+        if distance > 1.0 {
             canRecord = true
         }
         return canRecord
