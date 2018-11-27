@@ -13,32 +13,37 @@ class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        self.title = "AR导航";
         // Do any additional setup after loading the view.
         
-        let navBtn = UIButton(frame: CGRect(x: 50.0, y: 100.0, width: self.view.frame.size.width - 100.0, height: 50.0))
-        self.view.addSubview(navBtn)
-        navBtn.setTitle("根据方向加载导航", for: .normal)
-        navBtn.setTitleColor(UIColor.blue, for: .normal)
+//        let navBtn = UIButton(frame: CGRect(x: 50.0, y: 100.0, width: self.view.frame.size.width - 100.0, height: 50.0))
+//        self.view.addSubview(navBtn)
+//        navBtn.setTitle("根据方向加载导航", for: .normal)
+//        navBtn.setTitleColor(UIColor.blue, for: .normal)
+//
+//        navBtn.addTarget(self, action: #selector(navClick), for: .touchUpInside)
+//
+//        let arrowBtn = UIButton(frame: CGRect(x: 50.0, y: 200.0, width: self.view.frame.size.width - 100.0, height: 50.0))
+//        self.view.addSubview(arrowBtn)
+//        arrowBtn.setTitle("箭头导航", for: .normal)
+//        arrowBtn.setTitleColor(UIColor.blue, for: .normal)
+//
+//        arrowBtn.addTarget(self, action: #selector(arrowClick), for: .touchUpInside)
         
-        navBtn.addTarget(self, action: #selector(navClick), for: .touchUpInside)
-        
-        let arrowBtn = UIButton(frame: CGRect(x: 50.0, y: 200.0, width: self.view.frame.size.width - 100.0, height: 50.0))
-        self.view.addSubview(arrowBtn)
-        arrowBtn.setTitle("箭头导航", for: .normal)
-        arrowBtn.setTitleColor(UIColor.blue, for: .normal)
-        
-        arrowBtn.addTarget(self, action: #selector(arrowClick), for: .touchUpInside)
+        let logoImage = UIImageView(frame: CGRect(x: (self.view.frame.size.width - 90.0)/2, y: 150.0, width: 90.0, height: 90.0))
+        logoImage.image = UIImage(named: "golden_century_4")
+        self.view.addSubview(logoImage)
         
         let recordLocationBtn = UIButton(frame: CGRect(x: 50.0, y: 280.0, width: self.view.frame.size.width - 100.0, height: 50.0))
         self.view.addSubview(recordLocationBtn)
-        recordLocationBtn.setTitle("记录位置信息", for: .normal)
+        recordLocationBtn.setTitle("记录采集导航信息", for: .normal)
         recordLocationBtn.setTitleColor(UIColor.blue, for: .normal)
         recordLocationBtn.addTarget(self, action: #selector(recordLocation), for: .touchUpInside)
         
         
         let showRecordVectorBtn = UIButton(frame: CGRect(x: 50.0, y: 350.0, width: self.view.frame.size.width - 100.0, height: 50.0))
         self.view.addSubview(showRecordVectorBtn)
-        showRecordVectorBtn.setTitle("展示记录的导航", for: .normal)
+        showRecordVectorBtn.setTitle("展示采集到的导航", for: .normal)
         showRecordVectorBtn.setTitleColor(UIColor.blue, for: .normal)
         showRecordVectorBtn.addTarget(self, action: #selector(showRecordVector), for: .touchUpInside)
         

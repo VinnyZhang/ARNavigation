@@ -299,6 +299,7 @@ class RecordLocationViewController: ARSCNBaseViewController {
         else if refrenceImage.name == "car_3" {
             self.distinationType = .Car_3
             print("girl_3")
+            distinguishSuccess()
         }
         
     }

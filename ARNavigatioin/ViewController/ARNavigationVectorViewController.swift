@@ -134,7 +134,6 @@ class ARNavigationVectorViewController: ARSCNBaseViewController {
     private func deviceMotionPush() {
         if deviceMotionManager == nil {
             deviceMotionManager = CMMotionManager()
-            
             deviceMotionManager.deviceMotionUpdateInterval = 0.5
         }
         let queue = OperationQueue()
@@ -231,6 +230,7 @@ class ARNavigationVectorViewController: ARSCNBaseViewController {
         else if refrenceImage.name == "car_3" {
             self.distinationType = .Car_3
             print("girl_3")
+            distinguishSuccess()
         }
         
     }
